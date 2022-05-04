@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, abort, make_response
 from app.models.cats import Cat
 from app import db # gives access to sqlalchemy object
 
@@ -19,9 +19,24 @@ def create_one_cat():
         'msg': f'Sucessfully create cate with id {new_cat.id}'
     }, 201
 
+
 @cats_bp.route('', methods= ['GET'])
 def get_all_cats():
-    cats = Cat.query.all()
+    params = request.args # this will get all the parameters in a dictionary
+    if "color" in params and "age" in params:
+        color_name = params["color"]
+        age_value = params["age"]
+        cats = Cat.query.filter_by(color=color_name, age=age_value)
+        # example url to run this query: http://localhost:5000/cats?color=orange&age=4
+    elif "color" in params:
+        color_name = params["color"]
+        cats = Cat.query.filter_by(color=color_name) # pass in column_name = attribute/value
+        # example url to run this query: http://localhost:5000/cats?color=orange
+    elif "age" in params:
+        age_value = params['age']
+        cats = Cat.query.filter_by(age=age_value)
+    else:
+        cats = Cat.query.all()
     cats_response = []
     for cat in cats:
         cats_response.append({
@@ -57,18 +72,23 @@ def get_all_cats():
 #             })
 #     return jsonify(cat_response)
 
-@cats_bp.route("/<cat_id>", methods=["GET"])
-def get_one_cat(cat_id):
+# Helper Function:
+def get_cat_or_abort(cat_id):
     try:
         cat_id = int(cat_id)
     except ValueError:
         response = {"msg": f"Invalid id: {cat_id}.  Need a cat id number"}
-        return jsonify(response), 400
-
+        abort(make_response(jsonify(response), 400))
     chosen_cat = Cat.query.get(cat_id) # this replaced the for loop: for cat in cats
     if chosen_cat is None:
         response = {'msg': f"Could not find a cat with id {cat_id}"}
-        return jsonify(response), 404
+        abort(make_response(jsonify(response), 404))
+    return chosen_cat
+
+# refactored with helper function:
+@cats_bp.route("/<cat_id>", methods=["GET"])
+def get_one_cat(cat_id):
+    chosen_cat = get_cat_or_abort(cat_id)
     response = {
             'id':chosen_cat.id,
             'name': chosen_cat.name,
@@ -76,6 +96,26 @@ def get_one_cat(cat_id):
             'color': chosen_cat.color
             }
     return jsonify(response), 200
+
+# @cats_bp.route("/<cat_id>", methods=["GET"])
+# def get_one_cat(cat_id):
+#     try:
+#         cat_id = int(cat_id)
+#     except ValueError:
+#         response = {"msg": f"Invalid id: {cat_id}.  Need a cat id number"}
+#         return jsonify(response), 400
+
+#     chosen_cat = Cat.query.get(cat_id) # this replaced the for loop: for cat in cats
+#     if chosen_cat is None:
+#         response = {'msg': f"Could not find a cat with id {cat_id}"}
+#         return jsonify(response), 404
+#     response = {
+#             'id':chosen_cat.id,
+#             'name': chosen_cat.name,
+#             'age': chosen_cat.age,
+#             'color': chosen_cat.color
+#             }
+#     return jsonify(response), 200
 
 @cats_bp.route("/<cat_id>", methods=["PUT"]) 
 def update_one_cat(cat_id):
