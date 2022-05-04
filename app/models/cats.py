@@ -1,6 +1,6 @@
 from app import db    # this allows us to use sqlalchemy object we created
 
-class Cat(db.Model):
+class Cat(db.Model): # This is staying that Cats is a child class from db.Model
     # attributes will be columns, they are class variables rather than instance variables
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String)

@@ -85,7 +85,7 @@ def get_cat_or_abort(cat_id):
         abort(make_response(jsonify(response), 404))
     return chosen_cat
 
-# refactored with helper function:
+# Refactored with helper function:
 @cats_bp.route("/<cat_id>", methods=["GET"])
 def get_one_cat(cat_id):
     chosen_cat = get_cat_or_abort(cat_id)
