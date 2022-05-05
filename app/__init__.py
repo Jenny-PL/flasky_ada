@@ -16,18 +16,30 @@ db = SQLAlchemy() # This creates the database object
 migrate = Migrate()
 load_dotenv() # calling the function we imported above
 
-def create_app(testing = False):
-    # __name__ stores the name of the module we're in
+def create_app(testing=None):
+    # __name__ stores the name of the module we're in (placeholder)
     app = Flask(__name__)
 
-    # This turns off some notifications we don't want:
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
-    if testing == {'testing': True}:
-    # this connects our database to sqlalchemy
-    # default PostgreSQL port is 5432
-        app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('TESTING_SQLALCHEMY_DATABASE_URI')
+    # connect our database to app and tell it where it is
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False # gets rid of some little error
+    if testing is None:
+        app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SQLALCHEMY_DATABASE_URI")
     else:
-        app.config['SQLALCHEMY_DATABASE_URI']= os.environ.get('SQLALCHEMY_DATABASE_URI')
+        app.config["TESTING"] = True
+        app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("TESTING_SQLALCHEMY_DATABASE_URI")
+
+# def create_app(testing = None):
+#     # __name__ stores the name of the module we're in
+#     app = Flask(__name__)
+
+#     # This turns off some notifications we don't want:
+#     app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
+#     if testing == {'testing': True}:
+#     # this connects our database to sqlalchemy
+#     # default PostgreSQL port is 5432
+#         app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('TESTING_SQLALCHEMY_DATABASE_URI')
+#     else:
+#         app.config['SQLALCHEMY_DATABASE_URI']= os.environ.get('SQLALCHEMY_DATABASE_URI')
 
     # somehow important... to connect databse
     db.init_app(app)
