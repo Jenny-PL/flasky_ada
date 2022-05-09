@@ -119,13 +119,7 @@ def get_one_cat(cat_id):
 
 @cats_bp.route("/<cat_id>", methods=["PUT"]) 
 def update_one_cat(cat_id):
-    try:
-        cat_id = int(cat_id)
-    except ValueError:
-        response = {"msg": f"Invalid id: {cat_id}.  Need a cat id number"}
-        return jsonify(response), 400
-
-    chosen_cat = Cat.query.get(cat_id) # this replaced the for loop: for cat in cats
+    chosen_cat = get_cat_or_abort(cat_id)
     if chosen_cat is None:
         response = {'msg': f"Could not find a cat with id {cat_id}"}
         return jsonify(response), 404

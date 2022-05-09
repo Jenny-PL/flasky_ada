@@ -20,7 +20,7 @@ def test_one_cat_with_populated_db_returns_cat_json(client, seven_cats):
         'age': 8
     }
 
-def test_one_cat_with_populated_db_returns_cat_json(client, seven_cats):
+def test_populated_db_returns_all_cat_json(client, seven_cats):
     response = client.get("/cats")
     response_body = response.get_json()
 
