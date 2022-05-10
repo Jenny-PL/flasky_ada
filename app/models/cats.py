@@ -7,7 +7,7 @@ class Cat(db.Model): # This is staying that Cats is a child class from db.Model
     age = db.Column(db.Integer)
     color = db.Column(db.String)
     human_id = db.Column(db.Integer, db.ForeignKey('human.id')) # connecting to human table; with cat as child
-    human = db.relationship("Human", back_populates="cats")
+    human = db.relationship("Human", back_populates="cats") # cats is plural because it is the many in the one:many relationship
 
 # The model was based on this class:
 # class Cat:
